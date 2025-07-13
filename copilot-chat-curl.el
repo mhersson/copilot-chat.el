@@ -223,7 +223,9 @@ Optional argument ARGS are additional arguments to pass to curl."
   (let* ((json-data (json-parse-buffer :false-object :json-false))
          (device-code (gethash "device_code" json-data))
          (user-code (gethash "user_code" json-data))
-         (verification-uri (gethash "verification_uri" json-data)))
+         (verification-uri (if copilot-chat-enterprise-uri
+                               (format "https://%s/login/device" (copilot-chat--oauth-domain))
+                             (gethash "verification_uri" json-data))))
     (gui-set-selection 'CLIPBOARD user-code)
     (read-from-minibuffer
      (format

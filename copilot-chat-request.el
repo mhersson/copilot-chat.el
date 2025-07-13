@@ -61,7 +61,9 @@ Argument DATA is whatever PARSER function returns, or nil."
    (error "Http error"))
  (let ((device-code (alist-get 'device_code data))
        (user-code (alist-get 'user_code data))
-       (verification-uri (alist-get 'verification_uri data)))
+       (verification-uri (if copilot-chat-enterprise-uri
+                             (format "https://%s/login/device" (copilot-chat--oauth-domain))
+                           (alist-get 'verification_uri data))))
    (gui-set-selection 'CLIPBOARD user-code)
    (read-from-minibuffer
     (format
