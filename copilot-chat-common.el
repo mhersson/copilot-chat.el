@@ -54,7 +54,32 @@
   :type 'string
   :group 'copilot-chat)
 
+(defcustom copilot-chat-enterprise-uri nil
+  "URI for GitHub Enterprise Server. When set, use enterprise endpoints instead of public GitHub.
+Example: \"https://your-company.ghe.com\""
+  :type '(choice (const :tag "Use public GitHub" nil)
+                 (string :tag "Enterprise URI"))
+  :group 'copilot-chat)
+
 ;; Functions
+(defun copilot-chat--api-domain ()
+  "Get the appropriate API domain (public GitHub or enterprise)."
+  (if copilot-chat-enterprise-uri
+      (replace-regexp-in-string "^https?://" "copilot-api." copilot-chat-enterprise-uri)
+    "api.githubcopilot.com"))
+
+(defun copilot-chat--auth-domain ()
+  "Get the appropriate auth domain (public GitHub or enterprise)."
+  (if copilot-chat-enterprise-uri
+      (replace-regexp-in-string "^https?://" "api." copilot-chat-enterprise-uri)
+    "api.github.com"))
+
+(defun copilot-chat--oauth-domain ()
+  "Get the appropriate OAuth domain (public GitHub or enterprise)."
+  (if copilot-chat-enterprise-uri
+      (replace-regexp-in-string "^https?://" "" copilot-chat-enterprise-uri)
+    "github.com"))
+
 (defun copilot-chat--uuid ()
   "Generate a UUID."
   (format "%04x%04x-%04x-4%03x-%04x-%04x%04x%04x"

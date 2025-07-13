@@ -204,9 +204,10 @@ Then we need a session token."
       (when (file-exists-p token-file)
         (with-temp-buffer
           (insert-file-contents token-file)
-          (setf (copilot-chat-connection-token copilot-chat--connection)
-                (json-read-from-string
-                 (buffer-substring-no-properties (point-min) (point-max))))))))
+          (let ((content (string-trim (buffer-string))))
+            (when (> (length content) 0)
+              (setf (copilot-chat-connection-token copilot-chat--connection)
+                    (json-read-from-string content))))))))
 
   (when (or (null (copilot-chat-connection-token copilot-chat--connection))
             (> (round (float-time (current-time)))

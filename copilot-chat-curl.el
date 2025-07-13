@@ -235,7 +235,7 @@ If your browser does not open automatically, browse to %s."
     (read-from-minibuffer "Press ENTER after authorizing.")
     (with-temp-buffer
       (copilot-chat--curl-call-process
-       "https://github.com/login/oauth/access_token" 'post
+       (format "https://%s/login/oauth/access_token" (copilot-chat--oauth-domain)) 'post
        (format
         "{\"client_id\":\"Iv1.b507a08c87ecfe98\",\"device_code\":\"%s\",\"grant_type\":\"urn:ietf:params:oauth:grant-type:device_code\"}"
         device-code))
@@ -246,7 +246,7 @@ If your browser does not open automatically, browse to %s."
   "Manage github login."
   (with-temp-buffer
     (copilot-chat--curl-call-process
-     "https://github.com/login/device/code"
+     (format "https://%s/login/device/code" (copilot-chat--oauth-domain))
      'post
      "{\"client_id\":\"Iv1.b507a08c87ecfe98\",\"scope\":\"read:user\"}")
     (copilot-chat--curl-parse-login)))
@@ -277,7 +277,7 @@ If your browser does not open automatically, browse to %s."
   "Renew session token."
   (with-temp-buffer
     (copilot-chat--curl-call-process
-     "https://api.github.com/copilot_internal/v2/token" 'get nil
+     (format "https://%s/copilot_internal/v2/token" (copilot-chat--auth-domain)) 'get nil
      "-H"
      (format "authorization: token %s"
              (copilot-chat-connection-github-token copilot-chat--connection)))
@@ -597,7 +597,7 @@ if the prompt is out of context."
 
   (copilot-chat--curl-make-process
    instance
-   "https://api.githubcopilot.com/chat/completions"
+   (format "https://%s/chat/completions" (copilot-chat--api-domain))
    'post
    (concat "@" (copilot-chat-curl-file (copilot-chat--backend instance)))
    (lambda (proc string)
@@ -645,7 +645,7 @@ if the prompt is out of context."
     (let* ((curl-args
             (append
              (list
-              "https://api.github.com/rate_limit" "-s" "-X" "GET" "-H"
+              (format "https://%s/rate_limit" (copilot-chat--auth-domain)) "-s" "-X" "GET" "-H"
               (concat
                "authorization: Bearer "
                (copilot-chat-connection-github-token copilot-chat--connection))

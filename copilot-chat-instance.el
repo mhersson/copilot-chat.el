@@ -28,7 +28,7 @@
 
 (require 'polymode)
 
-;; GitHub Copilot models: https://api.githubcopilot.com/models
+;; GitHub Copilot models endpoint (configurable via copilot-chat-enterprise-uri)
 (defcustom copilot-chat-default-model "gpt-4o"
   "The model to use for Copilot chat.
 The list of available models will be updated when fetched from the API.

@@ -73,7 +73,7 @@ If your browser does not open automatically, browse to %s."
    (read-from-minibuffer "Press ENTER after authorizing.")
 
    (request
-    "https://github.com/login/oauth/access_token"
+    (format "https://%s/login/oauth/access_token" (copilot-chat--oauth-domain))
     :type "POST"
     :headers
     `(("content-type" . "application/json")
@@ -96,7 +96,7 @@ If your browser does not open automatically, browse to %s."
 (defun copilot-chat--request-login ()
   "Manage github login."
   (request
-   "https://github.com/login/device/code"
+   (format "https://%s/login/device/code" (copilot-chat--oauth-domain))
    :type "POST"
    :data "{\"client_id\":\"Iv1.b507a08c87ecfe98\",\"scope\":\"read:user\"}"
    :sync t
@@ -135,7 +135,7 @@ Argument DATA is whatever PARSER function returns, or nil."
 (defun copilot-chat--request-renew-token ()
   "Renew session token."
   (request
-   "https://api.github.com/copilot_internal/v2/token"
+   (format "https://%s/copilot_internal/v2/token" (copilot-chat--auth-domain))
    :type "GET"
    :headers
    `(("authorization" .
@@ -211,7 +211,7 @@ if the prompt is out of context."
   (let ((full-response ""))
     (setf (copilot-chat--backend instance)
           (request
-           "https://api.githubcopilot.com/chat/completions"
+           (format "https://%s/chat/completions" (copilot-chat--api-domain))
            :type "POST"
            :headers
            `(("openai-intent" . "conversation-panel")
@@ -373,7 +373,7 @@ Argument RESPONSE is request-response object."
 
 (defun copilot-chat--request-enable-model-policy (model-id)
   "Enable policy for MODEL-ID."
-  (let ((url (format "https://api.githubcopilot.com/models/%s/policy" model-id))
+  (let ((url (format "https://%s/models/%s/policy" (copilot-chat--api-domain) model-id))
         (headers (copilot-chat--get-headers))
         (data
          (json-serialize '((state . "enabled")) :false-object :json-false)))
@@ -393,7 +393,7 @@ Argument RESPONSE is request-response object."
 (defun copilot-chat--request-models (&optional quiet)
   "Fetch available models from Copilot API.
 Optional argument QUIET suppresses user messages when non-nil."
-  (let ((url "https://api.githubcopilot.com/models")
+  (let ((url (format "https://%s/models" (copilot-chat--api-domain)))
         (headers (copilot-chat--get-headers)))
     (when copilot-chat-debug
       (message "Fetching models from %s" url))
@@ -414,7 +414,7 @@ Optional argument QUIET suppresses user messages when non-nil."
 (defun copilot-chat--request-models-async (&optional quiet)
   "Fetch available models from Copilot API asynchronously.
 Optional argument QUIET suppresses user messages when non-nil."
-  (let ((url "https://api.githubcopilot.com/models")
+  (let ((url (format "https://%s/models" (copilot-chat--api-domain)))
         (headers (copilot-chat--get-headers)))
     (when copilot-chat-debug
       (message "Fetching models asynchronously from %s" url))
@@ -483,7 +483,7 @@ Optional argument QUIET suppresses user messages when non-nil."
   "Get the current GitHub Copilot quotas for INSTANCE."
   (let ((result '()))
     (request
-     "https://api.github.com/rate_limit"
+     (format "https://%s/rate_limit" (copilot-chat--auth-domain))
      :type "GET"
      :sync t
      :headers
